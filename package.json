@@ -10,7 +10,17 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
+    "@vueuse/core": "^10.11.0",
     "nuxt": "^3.12.4",
+    "pinia": "^2.1.7",
     "vue": "latest"
+  },
+  "devDependencies": {
+    "@element-plus/nuxt": "^1.0.9",
+    "@pinia-plugin-persistedstate/nuxt": "^1.2.1",
+    "@unocss/nuxt": "^0.61.5",
+    "@unocss/reset": "^0.61.5",
+    "element-plus": "^2.7.8"
   }
 }
