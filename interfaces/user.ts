@@ -1,15 +1,3 @@
-export interface AuthUser {
-  id: number
-  username: string
-  email: string
-  firstName: string
-  lastName: string
-  gender: string
-  image: string
-  token: string
-  refreshToken: string
-}
-
 export interface UserResponse {
   users: User[]
   limit: number
@@ -17,12 +5,14 @@ export interface UserResponse {
   total: number
 }
 
-export interface Params {
+export interface UserParams {
   limit?: number
   skip?: number
+  q?: string,
   sortBy?: string
   order?: string
-  q?: string
+  key?: string
+  value?: string
 }
 
 export interface User {

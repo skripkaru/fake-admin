@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia';
-import type {User} from "~/interfaces/user";
 import {useAuthService} from "~/services/auth";
+import type {AuthUser} from "~/interfaces/auth";
 
 export const useAuthStore = defineStore('auth', () => {
   const {userLogin} = useAuthService();
@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const authenticateUser = async ({username, password}: { username: string, password: string }) => {
     try {
-      const token = useCookie<User | null>('token');
+      const token = useCookie<AuthUser | null>('token');
       token.value = await userLogin(username, password)
       authenticated.value = true
     } catch (e) {

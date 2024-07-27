@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useUserService} from "~/services/users";
+import {useUserService} from "~/services/user";
 
 const router = useRouter()
 const route = useRoute()
@@ -27,8 +27,7 @@ useHead({
     <el-empty v-if="!user" description="User not found">
       <el-button @click="router.push('/users')">Go to users</el-button>
     </el-empty>
-
-    <el-descriptions v-else :column="1" border>
+    <el-descriptions v-else :column="1"  border>
       <el-descriptions-item label="Name">{{user.firstName}} {{user.lastName}} {{user.maidenName}}</el-descriptions-item>
       <el-descriptions-item label="Gender">{{user.gender}}</el-descriptions-item>
       <el-descriptions-item label="Age">{{user.age}}</el-descriptions-item>
@@ -42,7 +41,12 @@ useHead({
         {{user.address.postalCode}}, {{user.address.country}}, {{user.address.city}}, {{user.address.state}}, {{user.address.address}}
       </el-descriptions-item>
       <el-descriptions-item label="Role">
-        <el-tag size="small">{{user.role}}</el-tag>
+        <el-tag
+          :type="user.role === 'admin' ? 'primary' : user.role === 'moderator' ? 'success' : 'info'"
+          size="small"
+        >
+          {{user.role}}
+        </el-tag>
       </el-descriptions-item>
     </el-descriptions>
   </div>
