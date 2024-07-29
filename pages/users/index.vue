@@ -4,17 +4,20 @@ import {useUserStore} from "~/store/user";
 const router = useRouter()
 const userStore = useUserStore()
 const {fetchUsers, changePage} = userStore
-const {pending, users, page, limit, total, debouncedSearchQuery, sortBy, order, filters} = storeToRefs(userStore)
+const {pending, users, page, limit, total, searchQuery, sortBy, order, filters} = storeToRefs(userStore)
 
 const showFilters = ref<boolean>(false)
 const sortOption = ref<string>('')
 const selectedFilters = ref<{ role?: string }>({})
 
 const sortOptions = [
-  {value: 'firstName_asc', label: 'Name ↑'},
-  {value: 'firstName_desc', label: 'Name ↓'},
-  {value: 'email_asc', label: 'Email ↑'},
-  {value: 'email_desc', label: 'Email ↓'},
+  {value: '', label: 'All'},
+  {value: 'firstName_asc', label: 'First name ↑'},
+  {value: 'firstName_desc', label: 'First name ↓'},
+  {value: 'lastName_asc', label: 'Last name ↑'},
+  {value: 'lastName_desc', label: 'Last name ↓'},
+  {value: 'age_asc', label: 'Age ↑'},
+  {value: 'age_desc', label: 'Age ↓'},
 ]
 
 const roles = ref([
@@ -68,8 +71,8 @@ useHead({
       </template>
     </el-page-header>
 
-    <div class="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-4 mb-4">
-      <el-input v-model="debouncedSearchQuery" placeholder="Search"/>
+    <div class="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-4 mb-4">
+      <el-input v-model="searchQuery" placeholder="Search"/>
 
       <el-select v-model="sortOption" placeholder="Sort By">
         <el-option v-for="option in sortOptions" :key="option.value" :label="option.label" :value="option.value"/>
@@ -80,36 +83,38 @@ useHead({
       <el-button @click="router.push('/')">Go to dashboard</el-button>
     </el-empty>
     <template v-else>
-      <el-table :data="users" class="w-full mb-4">
-        <el-table-column prop="id" label="Id" width="60"/>
-        <el-table-column label="Image" width="80">
-          <template #default="scope">
-            <el-button @click="router.push(`/users/${scope.row.id}`)" link>
-              <el-avatar :size="32" :src="scope.row.image"/>
-            </el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="Name" width="320">
-          <template #default="scope">
-            <el-button @click="router.push(`/users/${scope.row.id}`)" type="primary" link>
-              {{ scope.row.firstName }} {{ scope.row.lastName }} {{ scope.row.maidenName }}
-            </el-button>
-          </template>
-        </el-table-column>
-        <el-table-column prop="email" label="Email" width="320"/>
-        <el-table-column prop="phone" label="Phone" width="280"/>
-        <el-table-column prop="ip" label="IP" width="280"/>
-        <el-table-column label="Role" width="160">
-          <template #default="scope">
-            <el-tag
-              :type="scope.row.role === 'admin' ? 'primary' : scope.row.role === 'moderator' ? 'success' : 'info'"
-              size="small"
-            >
-              {{ scope.row.role }}
-            </el-tag>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="w-full overflow-x-auto">
+        <el-table :data="users" table-layout="auto" class="w-full min-w-4xl mb-4">
+          <el-table-column prop="id" label="Id"/>
+          <el-table-column label="Image">
+            <template #default="scope">
+              <el-button @click="router.push(`/users/${scope.row.id}`)" link>
+                <el-avatar :size="32" :src="scope.row.image"/>
+              </el-button>
+            </template>
+          </el-table-column>
+          <el-table-column label="Name">
+            <template #default="scope">
+              <el-button @click="router.push(`/users/${scope.row.id}`)" type="primary" link>
+                {{ scope.row.firstName }} {{ scope.row.lastName }}
+              </el-button>
+            </template>
+          </el-table-column>
+          <el-table-column prop="age" label="Age"/>
+          <el-table-column prop="email" label="Email" />
+          <el-table-column prop="phone" label="Phone" />
+          <el-table-column label="Role" >
+            <template #default="scope">
+              <el-tag
+                :type="scope.row.role === 'admin' ? 'primary' : scope.row.role === 'moderator' ? 'success' : 'info'"
+                size="small"
+              >
+                {{ scope.row.role }}
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 
       <el-pagination
         layout="prev, pager, next"
@@ -117,6 +122,7 @@ useHead({
         :page-size="limit"
         :total="total"
         @current-change="changePage"
+        :pager-count="5"
         hide-on-single-page
       />
 

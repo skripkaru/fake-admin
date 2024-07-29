@@ -20,14 +20,14 @@ useHead({
   <div v-loading="pending" class="container mx-auto">
     <el-page-header @back="router.back()" class="mb-4">
       <template #content>
-        <h1 class="text-base lg:text-lg">{{`${user?.firstName} ${user?.lastName} ${user?.maidenName}` || 'Unknown user'}}</h1>
+        <h1 class="text-base lg:text-lg">{{`${user?.firstName} ${user?.lastName}` || 'Unknown user'}}</h1>
       </template>
     </el-page-header>
 
     <el-empty v-if="!user" description="User not found">
       <el-button @click="router.push('/users')">Go to users</el-button>
     </el-empty>
-    <el-descriptions v-else :column="1"  border>
+    <el-descriptions v-else :column="1" border>
       <el-descriptions-item label="Name">{{user.firstName}} {{user.lastName}} {{user.maidenName}}</el-descriptions-item>
       <el-descriptions-item label="Gender">{{user.gender}}</el-descriptions-item>
       <el-descriptions-item label="Age">{{user.age}}</el-descriptions-item>

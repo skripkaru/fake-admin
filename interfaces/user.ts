@@ -6,8 +6,8 @@ export interface UserResponse {
 }
 
 export interface UserParams {
-  limit?: number
-  skip?: number
+  limit: number
+  skip: number
   q?: string,
   sortBy?: string
   order?: string

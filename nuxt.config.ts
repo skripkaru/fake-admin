@@ -1,9 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  // app: {
-  //   pageTransition: { name: 'page', mode: 'out-in' },
-  // },
+  app: {
+    // pageTransition: { name: 'page', mode: 'out-in' },
+  },
   css: [
     '@unocss/reset/tailwind.css',
   ],
@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     '@element-plus/nuxt',
     '@pinia/nuxt',
     '@pinia-plugin-persistedstate/nuxt',
+    '@vueuse/nuxt',
   ],
   runtimeConfig: {
     public: {

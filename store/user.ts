@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
-import type {User} from "~/interfaces/user";
+import type {User, UserParams} from "~/interfaces/user";
 import {useUserService} from "~/services/user";
-import {useDebounce} from "@vueuse/core";
+import {refDebounced} from "@vueuse/core";
 
 export const useUserStore = defineStore('user', () => {
   const {getUsers, searchUsers, filterUsers} = useUserService()
@@ -19,26 +19,21 @@ export const useUserStore = defineStore('user', () => {
   const order = ref<string>('')
 
   const searchQuery = ref<string>('')
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+  const debouncedSearchQuery = refDebounced(searchQuery, 1000)
 
   const filters = ref<{ key: string; value: string }[]>([
     {key: 'role', value: '' as string},
-    // {key: 'hair.color', value: '' as string},
   ])
 
   const fetchUsers = async () => {
     pending.value = true
     error.value = null
     try {
-      // Инициализация параметров запроса
-      const initParams = {
+      let params: UserParams = {
         limit: limit.value,
         skip: (page.value - 1) * limit.value,
-        sortBy: sortBy.value,
-        order: order.value,
       }
 
-      // Формирование параметров фильтрации
       const filterParams = filters.value.reduce((params, filter) => {
         if (filter.value) {
           params.key = filter.key
@@ -47,19 +42,22 @@ export const useUserStore = defineStore('user', () => {
         return params
       }, {} as { key: string, value: string })
 
-      // Формирование параметров запроса
-      const params = {
-        ...initParams,
-        ...(debouncedSearchQuery.value ? { q: debouncedSearchQuery.value } : {}),
-        ...filterParams,
+      let response
+
+      if (sortBy.value && order.value) {
+        params = {...params, sortBy: sortBy.value, order: order.value}
       }
 
-      // Выбор метода для вызова API
-      const response = debouncedSearchQuery.value
-        ? await searchUsers(params)
-        : await (Object.keys(filterParams).length ? filterUsers(params) : getUsers(params))
+      if (debouncedSearchQuery.value) {
+        params = {...params, q: debouncedSearchQuery.value}
+        response = await searchUsers(params)
+      } else if (Object.keys(filterParams).length) {
+        params = {...params, ...filterParams}
+        response = await filterUsers(params)
+      } else {
+        response = await getUsers(params)
+      }
 
-      // Обновление состояния
       users.value = response.users
       total.value = response.total
 
@@ -68,6 +66,7 @@ export const useUserStore = defineStore('user', () => {
       error.value = e
     } finally {
       pending.value = false
+      searchQuery.value = ''
     }
   }
 
@@ -75,7 +74,13 @@ export const useUserStore = defineStore('user', () => {
     page.value = newPage
   }
 
-  watch([page, sortBy, order, debouncedSearchQuery, filters], fetchUsers)
+  watch([page, sortBy, order, filters], fetchUsers)
+
+  watch(debouncedSearchQuery, async (newDebouncedSearchQuery) => {
+    if (newDebouncedSearchQuery !== '') {
+      await fetchUsers()
+    }
+  })
 
   return {
     pending,
@@ -86,7 +91,7 @@ export const useUserStore = defineStore('user', () => {
     total,
     sortBy,
     order,
-    debouncedSearchQuery,
+    searchQuery,
     filters,
     fetchUsers,
     changePage

@@ -20,6 +20,10 @@ const login = async () => {
   }
 };
 
+definePageMeta({
+  layout: 'auth'
+})
+
 useHead({
   title: 'Sign In',
 })
@@ -28,7 +32,7 @@ useHead({
 <template>
   <div class="flex min-h-full flex-col justify-center container mx-auto">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <h1 class="mb-8 text-2xl lg:text-4xl text-center">Sign in to your account</h1>
+      <h1 class="mb-8 text-2xl lg:text-4xl text-center">Sign in</h1>
       <el-form label-position="top" label-width="auto">
         <el-form-item label="Username">
           <el-input
